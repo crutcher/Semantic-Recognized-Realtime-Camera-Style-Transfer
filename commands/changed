@@ -4,7 +4,7 @@ set -e
 
 cd $WORKSPACE_ROOT_DIR
 
-MAIN_BRANCH=main
+MAIN_BRANCH=master
 
 (
   git ls-files -o --exclude-standard --full-name
