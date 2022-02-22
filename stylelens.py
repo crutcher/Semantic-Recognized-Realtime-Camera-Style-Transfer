@@ -530,7 +530,7 @@ class ChakraLens:
             cam = cv2.VideoCapture(self.camera_device)
             cam.set(cv2.CAP_PROP_FRAME_WIDTH, self.capture_width)
             cam.set(cv2.CAP_PROP_FRAME_HEIGHT, self.capture_height)
-            cam.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+            cam.set(cv2.CAP_PROP_BUFFERSIZE, 4)
             cam.set(cv2.CAP_PROP_FPS, 30)
 
             while not self.halt:
