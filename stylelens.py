@@ -206,7 +206,9 @@ class StyleModels:
         self.vgg.cuda().eval()
         children = list(self.vgg.children())
         self.enc_1_to_4 = nn.Sequential(*children[:31])  # input -> relu4_1
+        self.enc_1_to_4.cuda(device).eval()
         self.enc_5 = nn.Sequential(*children[31:44])  # relu4_1 -> relu5_1
+        self.enc_5.cuda(device).eval()
 
         self.transform = style_model.Transform(in_planes=512)
         self.transform.load_state_dict(torch.load(TRANSFORMER_CHECKPOINT))
