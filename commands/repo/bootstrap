@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Exit on error.
+set -e
+
+cd $WORKSPACE_ROOT_DIR
+
+rm -rf venv
+
+virtualenv -p python3.9 --prompt "\n(venv)" venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+

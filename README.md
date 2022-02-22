@@ -1,4 +1,29 @@
-# Semantic Recognized Real-time Camera Style Transfer
+# StyleLens
+
+This is a *heavily* modfied version of the upstream repository [AlbertPi-Git/Semantic-Recognized-Realtime-Camera-Style-Transfer](https://github.com/AlbertPi-Git/Semantic-Recognized-Realtime-Camera-Style-Transfer), isolating the [GlebBrykin/SANET](https://github.com/GlebSBrykin/SANET) branch and optimizing it for threaded speed, display aesthetics, and dynamic control.
+
+I've attempted to make this installable, but I haven't tested tat much with other people.
+
+Install steps:
+  * run `./grind repo bootstrap`
+    * I'm using `pip-tools` to build a `requirements.txt` file, sourced from `requirements.in`
+    * I'm sourcing `constraints.in` with local overrides
+     for torch versions.
+  * download the model weights, put them in `model_checkpoints/` (see below)
+  * source the venv `source venv/bin/activate`
+  * run `python hack.py`
+
+Install steps to get alsa to work (for the controller):
+  * `sudo apt-get install libasound2-plugins:i386`
+  * this bullshit:
+    https://askubuntu.com/questions/542984/unable-to-open-shared-libasound-library-despite-file-existing 
+   
+  
+    cd /usr/lib/x86_64-linux-gnu/
+    sudo ln -s alsa-lib/libasound_module_conf_pulse.so libasound_module_conf_pulse.so
+
+
+## Source README: Semantic Recognized Real-time Camera Style Transfer
 
 ## Introduction
 This repository is an extension of Image Recognition course final project, which intends to develop an application that can achieve semantic recognized real-time camera arbitrary multi-style transfer. Specifically, I intend to apply different styles to human and background dynamically by utilizing human segmentation technique.   

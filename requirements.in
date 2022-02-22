@@ -1,0 +1,43 @@
+# The requirements file is bound by a .gitignored local 'constraints.in' file.
+# If you need to specify a special version of pytorch, that is the location
+# to add the links to.
+-c constraints.in
+
+# torch
+torch
+torchvision
+
+json5
+
+pygame
+
+kornia
+
+# launchpad
+
+paho-mqtt
+
+
+torchsummary
+tensorboard
+matplotlib
+timm
+
+opencv-python
+
+# Python
+# bug in pip-tools
+pip==21.3.1
+pip-tools
+
+# ipython
+ipython
+
+autoflake
+black
+isort
+
+
+# numpy
+numpy
+

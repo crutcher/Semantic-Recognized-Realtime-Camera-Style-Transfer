@@ -1,0 +1,35 @@
+{
+  "styles": [
+    "input/style/en_campo_gris.jpg",
+    "input/sketchup.jpg",
+    "input/boss.png",
+    "input/neon.jpg",
+    "input/starry.jpg",
+    "input/pumpkin.jpg",
+    "input/style/la_muse.jpg",
+
+    "input/frogs.png",
+    "input/muppets.jpg",
+    "input/chalkboard.jpg",
+    "input/fayes.png",
+    "input/andriesc.jpg",
+    "input/style/brick.jpg",
+    "input/style/brushstrokes.jpg",
+
+    "input/style/candy.jpg",
+    "input/style/mondrian_cropped.jpg",
+    "input/style/mosaic.jpg",
+    "input/style/contrast_of_forms.jpg",
+    "input/style/abstraction.jpg",
+    "input/style/trial.jpg",
+    "input/style/picasso_seated_nude_hr.jpg",
+
+    "input/style/the_resevoir_at_poitiers.jpg",
+    "input/style/woman_with_hat_matisse.jpg",
+    "input/style/yellow_sunset.jpg",
+    "input/style/antimonocromatismo.jpg",
+    "input/style/trial.jpg",
+    "input/style/yellow_sunset.jpg",
+    "input/bluebears.png",
+  ]
+}

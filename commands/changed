@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+cd $WORKSPACE_ROOT_DIR
+
+MAIN_BRANCH=main
+
+(
+  git ls-files -o --exclude-standard --full-name
+  git diff --name-only $(git merge-base --fork-point $MAIN_BRANCH HEAD)
+) | sort -u
+

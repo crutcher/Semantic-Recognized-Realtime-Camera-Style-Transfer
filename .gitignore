@@ -1,0 +1,9 @@
+.*.swp
+*.iml
+
+/.idea/
+
+model_checkpoints/*
+
+/venv/
+__pycache__
