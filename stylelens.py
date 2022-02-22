@@ -418,7 +418,7 @@ class ChakraLens:
         self.freeze = False
         self.mirror = True
         self.flip = False
-        self.feedback = 0.05
+        self.feedback = 0.08
 
     def save_current_lens(self, *, redo: bool = False):
         if redo:
@@ -504,12 +504,12 @@ class ChakraLens:
         self.mirror = not self.mirror
 
     def action_more_weird(self) -> None:
-        print("more_weird")
-        self.feedback = min(self.feedback + 0.07, 0.5)
+        self.feedback = min(self.feedback + 0.01, 0.5)
+        print("more_weird:", self.feedback)
 
     def action_less_weird(self) -> None:
-        print("less_weird")
-        self.feedback = max(self.feedback - 0.07, 0.05)
+        self.feedback = max(self.feedback - 0.01, 0.01)
+        print("less_weird:", self.feedback)
 
     def render(self, style: int, source: LazyInput) -> torch.Tensor:
         if style == self.PASSTHROUGH:
@@ -714,16 +714,24 @@ class ChakraLens:
             if self.mirror:
                 content_tensor = content_tensor.flip(2)
 
+            content_tensor = torchvision.transforms.functional.resize(
+                content_tensor,
+                (display.get_height(), display.get_width()),
+                interpolation=torchvision.transforms.InterpolationMode.BICUBIC,
+            )
+            torch.clamp_(content_tensor, 0.0, 1.0)
+
             display_img = to_cv2_image(content_tensor)
 
             # pygame requires you build the target surface yourself.
-            display_img = cv2.resize(
-                to_cv2_image(content_tensor),
-                (display.get_width(), display.get_height()),
-                cv2.INTER_CUBIC,
-            )
+            # display_img = cv2.resize(
+            #     to_cv2_image(content_tensor),
+            #     (display.get_width(), display.get_height()),
+            #     cv2.INTER_CUBIC,
+            # )
+
             # display_img = cv2.GaussianBlur(display_img, (5, 5), 0)
-            cv2.GaussianBlur(src=display_img, dst=display_img, ksize=(5, 5), sigmaX=0, sigmaY=0)
+            # cv2.GaussianBlur(src=display_img, dst=display_img, ksize=(5, 5), sigmaX=0, sigmaY=0)
             # cv2.dilate(src=display_img, dst=display_img, kernel=(5, 5))
 
             # H, W, BGR, float32
