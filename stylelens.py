@@ -205,11 +205,7 @@ class StyleModels:
         self.vgg.load_state_dict(torch.load(VGG_CHECKPOINT))
         self.vgg.cuda().eval()
         children = list(self.vgg.children())
-        self.norm = nn.Sequential(*children[:1])
-        self.enc_1 = nn.Sequential(*children[:4])  # input -> relu1_1
-        self.enc_2 = nn.Sequential(*children[4:11])  # relu1_1 -> relu2_1
-        self.enc_3 = nn.Sequential(*children[11:18])  # relu2_1 -> relu3_1
-        self.enc_4 = nn.Sequential(*children[18:31])  # relu3_1 -> relu4_1
+        self.enc_1_to_4 = nn.Sequential(*children[:31])  # input -> relu4_1
         self.enc_5 = nn.Sequential(*children[31:44])  # relu4_1 -> relu5_1
 
         self.transform = style_model.Transform(in_planes=512)
@@ -223,7 +219,7 @@ class StyleModels:
         print("Done Loading Style Transfer Network\n")
 
     def run_enc_1_to_4(self, input: torch.Tensor) -> torch.Tensor:
-        return self.enc_4(self.enc_3(self.enc_2(self.enc_1(input.unsqueeze(0)))))
+        return self.enc_1_to_4(input.unsqueeze(0))
 
     def run_enc_5(self, e4: torch.Tensor) -> torch.Tensor:
         return self.enc_5(e4)
@@ -897,13 +893,13 @@ def main(argv):
     parser.add_argument(
         "--display_width",
         type=int,
-        default=1600, # 1280,  # 1280,
+        default=1600,  # 1280,  # 1280,
         help="Display resize width",
     )
     parser.add_argument(
         "--display_height",
         type=int,
-        default=900, # 720,  # 720,
+        default=900,  # 720,  # 720,
         help="Display resize height",
     )
 
