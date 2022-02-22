@@ -3,7 +3,7 @@
 
 /.idea/
 
-model_checkpoints/*
+model_checkpoints/UNet_ResNet18.pth
 
 /venv/
 __pycache__
