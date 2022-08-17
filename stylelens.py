@@ -314,6 +314,7 @@ class ChakraLens:
 
     PASSTHROUGH = -1
     NOTHING = -2
+    SELF = -4
 
     fg: int = PASSTHROUGH
     bg: int = PASSTHROUGH
@@ -515,6 +516,12 @@ class ChakraLens:
 
         if style == self.NOTHING:
             return torch.empty_like(source.input)
+
+        if style == self.SELF:
+           return apply_transform(
+               source.encoded,
+               style=source.encoded,
+           )
 
         return apply_transform(
             source.encoded,

@@ -41,3 +41,6 @@ isort
 # numpy
 numpy
 
+nbqa
+mypy
+

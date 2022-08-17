@@ -9,12 +9,10 @@ source venv/bin/activate
 if (( $# )) ; then
   TARGETS=( $@ )
 else
-  TARGETS=( smot )
+  TARGETS=( . )
 fi
 
 echo "Code Quality Scans ..."
-
-MYPYPATH=$PWD nbqa mypy smot
 
 mypy "${TARGETS[@]}"
 

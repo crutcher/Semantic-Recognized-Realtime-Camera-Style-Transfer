@@ -1,7 +1,9 @@
 import argparse
+import queue
 import sys
+import threading
 from dataclasses import dataclass
-from typing import Union
+from typing import Any, List, Union
 
 import cv2
 import json5
@@ -29,9 +31,111 @@ class ModelRunner:
     def load(self) -> None:
         raise NotImplemented
 
+    def apply(self, **kwargs) -> Any:
+        raise NotImplemented
+
+
+class Halt:
+    pass
+
+
+def round_robin_model_runners(
+    input_queue: queue.Queue,
+    output_queue: queue.Queue,
+    order: List[ModelRunner],
+    get_timeout: float = 0.005,
+):
+    def model_run(
+        model_runner: ModelRunner,
+        runner_input: queue.Queue,
+        runner_output: queue.Queue,
+        get_timeout: float,
+    ):
+        while True:
+            try:
+                job = runner_input.get(timeout=get_timeout)
+            except queue.Empty:
+                continue
+
+            if job == Halt:
+                runner_output.put(Halt)
+                break
+
+            runner_output.put(model_runner.apply(**job), block=True)
+
+    runner_threads = []
+    thread_input_queues = []
+    thread_output_queues = []
+    for runner in order:
+        runner_input = queue.Queue()
+        runner_output = queue.Queue()
+        thread_input_queues.append(runner_input)
+        thread_output_queues.append(runner_output)
+
+        runner_thread = threading.Thread(
+            target=model_run,
+            kwargs=dict(
+                model_runner=runner,
+                runner_input=runner_input,
+                runner_output=runner_output,
+                get_timeout=get_timeout,
+            ),
+            daemon=True,
+        )
+        runner_threads.append(runner_thread)
+        runner_thread.start()
+
+    def push_run():
+        idx = 0
+        while True:
+            try:
+                job = input_queue.get(timeout=get_timeout)
+            except queue.Empty:
+                continue
+
+            if job == Halt:
+                break
+
+            thread_input_queues[idx].put(job, block=True)
+            idx = (idx + 1) % len(thread_input_queues)
+
+    push_thread = threading.Thread(
+        target=push_run,
+        daemon=True,
+    )
+    push_thread.start()
+
+    def pull_run():
+        idx = 0
+        qs = thread_output_queues[:]
+        while qs:
+            try:
+                result = qs.get(timeout=get_timeout)
+            except queue.Empty:
+                continue
+
+            if result == Halt:
+                qs.remove(idx)
+            else:
+                output_queue.put(result, block=True)
+                idx = (idx + 1) % len(qs)
+
+    pull_thread = threading.Thread(
+        target=pull_run,
+        daemon=True,
+    )
+    pull_thread.start()
+
+    push_thread.join()
+    for t in runner_threads:
+        t.join()
+    pull_thread.join()
+
 
 @dataclass
 class EncodedFrame:
+    """batch[1] encoded e4/e5 pair"""
+
     e4: torch.Tensor
     e5: torch.Tensor
 
@@ -72,20 +176,21 @@ class StyleRunner(ModelRunner):
                 return source
             else:
                 return EncodedFrame(
-                    e4=torch.as_tensor(source.e4, device=self.device),
-                    e5=torch.as_tensor(source.e5, device=self.device),
+                    e4=torch.as_tensor(source.e4, device=self.device).detach(),
+                    e5=torch.as_tensor(source.e5, device=self.device).detach(),
                 )
 
-        source = torch.as_tensor(source, device=self.device)
+        source = torch.as_tensor(source, device=self.device).detach()
 
-        e4 = self.enc_1_to_4(source.unsqueeze(0))
-        e5 = self.enc_5(e4)
+        e4 = self.enc_1_to_4(source.unsqueeze(0)).detach()
+        e5 = self.enc_5(e4).detach()
 
         return EncodedFrame(e4, e5)
 
     @torch.inference_mode()
     def apply(
         self,
+        *,
         source: EncodedFrameOrTensor,
         style: EncodedFrameOrTensor,
     ) -> torch.Tensor:
@@ -99,7 +204,7 @@ class StyleRunner(ModelRunner):
             style.e5,
         )
 
-        return self.decoder(t).squeeze()
+        return self.decoder(t).squeeze().detach()
 
 
 def central_square_crop(img: np.ndarray) -> np.ndarray:
